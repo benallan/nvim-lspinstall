@@ -59,12 +59,24 @@ end
 --@returns table
 function M.apply_shell_options(options)
 
+  if options.shell ~= nil then
     vim.o.shell = options.shell
+  end
+  if options.shellquote ~= nil then
     vim.o.shellquote = options.shellquote
+  end
+  if options.shellpipe ~= nil then
     vim.o.shellpipe = options.shellpipe
+  end
+  if options.shellxquote ~= nil then
     vim.o.shellxquote = options.shellxquote
+  end
+  if options.shellcmdflag ~= nil then
     vim.o.shellcmdflag = options.shellcmdflag
+  end
+  if options.shellredir ~= nil then
     vim.o.shellredir = options.shellredir
+  end
 
 end
 
