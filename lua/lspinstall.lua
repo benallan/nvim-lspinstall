@@ -62,6 +62,40 @@ function M.install_server(lang)
 end
 
 
+local function uninstall_server_posix(lang, path, onExit)
+  vim.cmd("new")
+  local shell = vim.o.shell
+  vim.o.shell = "/bin/bash"
+
+  local preamble = "set -e\n"
+  vim.fn.termopen(preamble .. (servers[lang].uninstall_script or ""), { cwd = path, on_exit = onExit })
+
+  vim.o.shell = shell
+  vim.cmd("startinsert")
+end
+
+
+local function uninstall_server_win(lang, path, onExit)
+  local saved_options = util.get_shell_options()
+  vim.cmd("new")
+
+  util.apply_shell_options {
+    shell = "powershell.exe",
+    shellquote = "",
+    shellpipe = "|",
+    shellxquote = "",
+    shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command",
+    shellredir = "| Out-File -Encoding UTF8",
+  }
+
+  local preamble = '$ErrorActionPreference="Stop"\n'
+  vim.fn.termopen(preamble .. (servers[lang].uninstall_script or ""), { cwd = path, on_exit = onExit })
+
+  util.apply_shell_options(saved_options)
+  vim.cmd("startinsert")
+end
+
+
 -- UNINSTALL
 
 function M.uninstall_server(lang)
@@ -82,13 +116,11 @@ function M.uninstall_server(lang)
     if M.post_uninstall_hook then M.post_uninstall_hook() end
   end
 
-  vim.cmd("new")
-  local shell = vim.o.shell
-  vim.o.shell = "/usr/bin/env bash"
-  vim.fn.termopen("set -e\n" .. (servers[lang].uninstall_script or ""),
-                  { cwd = path, on_exit = onExit })
-  vim.o.shell = shell
-  vim.cmd("startinsert")
+  if windows_os then
+    uninstall_server_win(lang, path, onExit)
+  else
+    uninstall_server_posix(lang, path, onExit)
+  end
 end
 
 -- UTILITY
