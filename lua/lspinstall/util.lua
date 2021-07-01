@@ -27,4 +27,45 @@ function M.install_path(lang)
   return vim.fn.stdpath("data") .. "/lspinstall/" .. lang
 end
 
+--- Check if current platform is windows
+--@returns bool
+function M.detect_windows()
+
+  local sysname = vim.loop.os_uname().sysname
+
+  -- The value of sysname seems to vary on windows
+  return sysname == "Windows" or sysname == "Windows_NT"
+end
+
+
+--- Get current vim options related to shell
+--@returns table
+function M.get_shell_options()
+
+  return {
+    shell = vim.o.shell,
+    shellquote = vim.o.shellquote,
+    shellpipe = vim.o.shellpipe,
+    shellxquote = vim.o.shellxquote,
+    shellcmdflag = vim.o.shellcmdflag,
+    shellredir = vim.o.shellredir,
+  }
+
+end
+
+
+--- Get current vim options related to shell
+--@param options Table of options (same format as return value of get_shell_shell_options)
+--@returns table
+function M.apply_shell_options(options)
+
+    vim.o.shell = options.shell
+    vim.o.shellquote = options.shellquote
+    vim.o.shellpipe = options.shellpipe
+    vim.o.shellxquote = options.shellxquote
+    vim.o.shellcmdflag = options.shellcmdflag
+    vim.o.shellredir = options.shellredir
+
+end
+
 return M
